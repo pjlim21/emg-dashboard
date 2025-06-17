@@ -1,6 +1,4 @@
-import { BodyPart } from "..";
-
-export const bodyFront: BodyPart[] = [
+export const bodyFront = [
   // Chest
   {
     slug: "chest",
