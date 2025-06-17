@@ -1,6 +1,6 @@
 // EMG Dashboard Application
-class EMGDashboard {
-    constructor() {
+export default class EMGDashboard {
+    constructor(front, back) {
         this.data = {
             configurations: [],
             sessions: [],
@@ -24,7 +24,8 @@ class EMGDashboard {
             {"name": "Zero Crossings", "unit": "count", "description": "Number of zero crossings"},
             {"name": "Waveform Length", "unit": "mV", "description": "Cumulative waveform length"}
         ];
-
+        this.bodyFront = front;
+        this.bodyBack  = back;
         this.currentBodyView = 'front';
         this.selectedMuscle = null;
         
@@ -325,7 +326,7 @@ selectMuscle(slug) {                                            // <─ uses SVG
     populateInitialData() {
         // Populate muscle group dropdown
         const muscleSelect = document.querySelector('select[name="muscleGroup"]');
-        const allMuscles = [...this.muscleGroups.front, ...this.muscleGroups.back];
+        const allMuscles = [...this.bodyFront, ...this.bodyBack];
         muscleSelect.innerHTML = '<option value="">Select muscle group</option>' +
             allMuscles.map(muscle => `<option value="${muscle.id}">${muscle.name}</option>`).join('');
 
@@ -793,7 +794,7 @@ selectMuscle(slug) {                                            // <─ uses SVG
     }
 
     getMuscleNameById(id) {
-        const allMuscles = [...this.muscleGroups.front, ...this.muscleGroups.back];
+        const allMuscles = [...this.bodyFront, ...this.bodyBack];
         const muscle = allMuscles.find(m => m.id === id);
         return muscle ? muscle.name : id;
     }
