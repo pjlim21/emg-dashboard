@@ -1,36 +1,35 @@
 // EMG Dashboard Application
 export default class EMGDashboard {
-    constructor(front, back) {
-        this.data = {
-            configurations: [],
-            sessions: [],
-            customMetrics: []
-        };
-        
-        
-        this.electrodeTypes = [
-            {"value": "bipolar", "label": "Bipolar", "description": "Two electrodes of same size for differential measurement"},
-            {"value": "monopolar", "label": "Monopolar", "description": "Active electrode with reference electrode"},
-            {"value": "multichannel", "label": "Multi-channel", "description": "Multiple electrode array for high-density recording"}
-        ];
+  constructor(front, back) {
+    /* 🟢  SVG data arrives through the constructor */
+    this.bodyFront        = front;
+    this.bodyBack         = back;
 
-        this.defaultMetrics = [
-            {"name": "RMS", "unit": "mV", "description": "Root Mean Square amplitude"},
-            {"name": "ARV", "unit": "mV", "description": "Average Rectified Value"},
-            {"name": "MNF", "unit": "Hz", "description": "Mean Frequency"},
-            {"name": "MDF", "unit": "Hz", "description": "Median Frequency"},
-            {"name": "SNR", "unit": "dB", "description": "Signal-to-Noise Ratio"},
-            {"name": "Peak Amplitude", "unit": "mV", "description": "Maximum signal amplitude"},
-            {"name": "Zero Crossings", "unit": "count", "description": "Number of zero crossings"},
-            {"name": "Waveform Length", "unit": "mV", "description": "Cumulative waveform length"}
-        ];
-        this.bodyFront = front;
-        this.bodyBack  = back;
-        this.currentBodyView = 'front';
-        this.selectedMuscle = null;
-        
-        this.init();
-    }
+    /* 🔵  persistent app-state */
+    this.data = { configurations: [], sessions: [], customMetrics: [] };
+    this.currentBodyView = 'front';
+    this.selectedMuscle  = null;
+
+    /* 🔴  static lookup tables (unchanged) */
+    this.electrodeTypes = [
+      { value: 'bipolar',     label: 'Bipolar'    , description: 'Two electrodes of same size for differential measurement' },
+      { value: 'monopolar',   label: 'Monopolar'  , description: 'Active electrode with reference electrode'             },
+      { value: 'multichannel',label: 'Multi-channel', description: 'Multiple electrode array for high-density recording' }
+    ];
+    this.defaultMetrics = [
+      { name: 'RMS', unit: 'mV', description: 'Root Mean Square amplitude' },
+      { name: 'ARV', unit: 'mV', description: 'Average Rectified Value'    },
+      { name: 'MNF', unit: 'Hz', description: 'Mean Frequency'             },
+      { name: 'MDF', unit: 'Hz', description: 'Median Frequency'           },
+      { name: 'SNR', unit: 'dB', description: 'Signal-to-Noise Ratio'      },
+      { name: 'Peak Amplitude', unit: 'mV', description: 'Maximum signal amplitude' },
+      { name: 'Zero Crossings', unit: 'count', description: 'Number of zero crossings' },
+      { name: 'Waveform Length',unit: 'mV', description: 'Cumulative waveform length' }
+    ];
+
+    /* 🟡  kick-off */
+    this.init();
+  }
 
     init() {
         this.loadData();
@@ -48,20 +47,19 @@ export default class EMGDashboard {
 
   /*  flatten left / right / common path arrays into one <path> element  */
     buildPathElement(part) {
-        const segmentList = [
-          ...(part.path.common || []),
-          ...(part.path.left   || []),
-          ...(part.path.right  || [])
-        ];
-        const d = segmentList.join(" ");
-    
-        const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        p.setAttribute("d", d);
-        p.setAttribute("fill", part.color || "#6b7280");
-        p.dataset.slug = part.slug;
-        p.classList.add("muscle-path");
-        return p;
-      }
+    const d = [
+      ...(part.path.common || []),
+      ...(part.path.left   || []),
+      ...(part.path.right  || [])
+    ].join(' ');
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',    d);
+    p.setAttribute('fill', part.color || '#6b7280');
+    p.dataset.slug = part.slug;
+    p.classList.add('muscle-path');
+    p.addEventListener('click',() => this.selectMuscle(part.slug));
+    return p;
+  }
     // Data Management
     loadData() {
         const savedData = localStorage.getItem('emgDashboardData');
