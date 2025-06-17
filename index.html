@@ -159,44 +159,32 @@
 
             <!-- Body Diagram Page -->
             <div id="body-diagram" class="page">
-                <div class="page-header">
-                    <h1>Interactive Body Diagram</h1>
-                    <p>Click on muscle groups to view or assign configurations</p>
+              <div class="page-header">
+                <h1>Interactive Body Diagram</h1>
+                <p>Click on muscle groups to view or assign configurations</p>
+              </div>
+            
+              <div class="body-diagram-container">
+                <!-- 1️⃣ view toggle – no inline JS  -->
+                <div class="diagram-toggle">
+                  <button class="btn btn--secondary diagram-toggle__btn" data-view="front">Front View</button>
+                  <button class="btn btn--secondary diagram-toggle__btn" data-view="back" >Back View</button>
                 </div>
-
-                <div class="body-diagram-container">
-                    <div class="diagram-toggle">
-                        <button class="btn btn--secondary active" id="front-view-btn" onclick="showBodyView('front')">Front View</button>
-                        <button class="btn btn--secondary" id="back-view-btn" onclick="showBodyView('back')">Back View</button>
-                    </div>
-
-                    <div class="body-diagrams">
-                        <div id="front-body" class="body-view active">
-                            <svg class="body-svg" viewBox="0 0 400 600">
-                                <!-- Front body outline -->
-                                <path d="M200 50 C180 50 160 60 150 80 L140 120 L130 160 L125 200 L120 240 L115 280 L110 320 L105 360 L100 400 L95 440 L90 480 L85 520 L80 560 L200 580 L320 560 L315 520 L310 480 L305 440 L300 400 L295 360 L290 320 L285 280 L280 240 L275 200 L270 160 L260 120 L250 80 C240 60 220 50 200 50 Z" 
-                                      fill="#f0f8ff" stroke="#1e3a8a" stroke-width="2"/>
-                                <!-- Muscle group indicators will be added via JavaScript -->
-                            </svg>
-                        </div>
-
-                        <div id="back-body" class="body-view">
-                            <svg class="body-svg" viewBox="0 0 400 600">
-                                <!-- Back body outline -->
-                                <path d="M200 50 C180 50 160 60 150 80 L140 120 L130 160 L125 200 L120 240 L115 280 L110 320 L105 360 L100 400 L95 440 L90 480 L85 520 L80 560 L200 580 L320 560 L315 520 L310 480 L305 440 L300 400 L295 360 L290 320 L285 280 L280 240 L275 200 L270 160 L260 120 L250 80 C240 60 220 50 200 50 Z" 
-                                      fill="#f0f8ff" stroke="#1e3a8a" stroke-width="2"/>
-                            </svg>
-                        </div>
-                    </div>
+            
+                <!-- 2️⃣ empty holders – app.js will draw the <path> elements -->
+                <div class="body-diagrams">
+                  <div id="front-body" class="body-view active"></div>
+                  <div id="back-body"  class="body-view"></div>
                 </div>
-
-                <!-- Muscle Group Info Panel -->
-                <div id="muscle-info-panel" class="muscle-info-panel">
-                    <h3 id="selected-muscle-name">Select a muscle group</h3>
-                    <div id="muscle-details" class="muscle-details">
-                        <p>Click on a muscle group to view configuration details and options.</p>
-                    </div>
+              </div>
+            
+              <!-- 3️⃣ side panel -->
+              <div id="muscle-info-panel" class="muscle-info-panel">
+                <h3 id="selected-muscle-name">Select a muscle group</h3>
+                <div id="muscle-details" class="muscle-details">
+                  <p>Click on a muscle group to view configuration details and options.</p>
                 </div>
+              </div>
             </div>
 
             <!-- Session Management Page -->
@@ -333,6 +321,22 @@
     
       /* make the instance visible to inline handlers */
       window.emgDashboard = new EMGDashboard(bodyFront, bodyBack);
+    
+  /* wire the view-toggle buttons */
+      document.querySelectorAll('.diagram-toggle__btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          /* switch active button */
+          document.querySelectorAll('.diagram-toggle__btn')
+                  .forEach(b => b.classList.toggle('active', b === btn));
+    
+          /* swap view inside the class */
+          emgDashboard.currentBodyView = btn.dataset.view;
+          document.querySelectorAll('.body-view').forEach(view => {
+            view.classList.toggle('active', view.id.startsWith(btn.dataset.view));
+          });
+          emgDashboard.renderBodyDiagram();   // draw correct side
+        });
+      });
     </script>
 </body>
 </html>
