@@ -326,8 +326,13 @@
 
     <!-- Toast Notifications -->
     <div id="toast-container" class="toast-container"></div>
-    <script type="module" src="./assets/bodyFront.js"></script>
-    <script type="module" src="./assets/bodyBack.js"></script>
-    <script src="app.js"></script>
+    <script type="module">
+      import { bodyFront } from './assets/bodyFront.js';
+      import { bodyBack  } from './assets/bodyBack.js';
+      import EMGDashboard from './app.js';
+    
+      /* make the instance visible to inline handlers */
+      window.emgDashboard = new EMGDashboard(bodyFront, bodyBack);
+    </script>
 </body>
 </html>
