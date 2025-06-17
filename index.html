@@ -150,9 +150,10 @@
                 <!-- Body Diagram Container -->
                 <div class="body-diagram-container">
                     <!-- View Toggle -->
+                    <!-- Body Diagram Toggle Buttons -->
                     <div class="diagram-toggle">
                         <button id="front-view-btn" class="btn btn--secondary active">Front View</button>
-                        <button id="back-view-btn" class="btn btn--secondary">Back View 1</button>
+                        <button id="back-view-btn" class="btn btn--secondary">Back View</button>
                     </div>
 
                     <!-- Body Diagrams -->
@@ -503,7 +504,13 @@
                 document.getElementById('close-session-modal').addEventListener('click', () => this.hideAddSessionForm());
                 document.getElementById('cancel-config-btn').addEventListener('click', () => this.hideAddConfigForm());
                 document.getElementById('cancel-session-btn').addEventListener('click', () => this.hideAddSessionForm());
+
+
+                const frontBtn = document.getElementById('front-view-btn');
+                const backBtn = document.getElementById('back-view-btn');
                 
+                console.log('Front button found:', frontBtn);
+                console.log('Back button found:', backBtn);
                 // ✅ CRITICAL FIX: Body view toggle buttons
                 document.getElementById('front-view-btn').addEventListener('click', (e) => {
                     e.preventDefault();
