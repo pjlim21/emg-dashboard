@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMG Configuration Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>EMG Dashboard</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-page="overview">
+                        <span class="nav-icon">📊</span>
+                        Dashboard Overview
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="configurations">
+                        <span class="nav-icon">⚙️</span>
+                        Configuration Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="body-diagram">
+                        <span class="nav-icon">🧍</span>
+                        Body Diagram
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="sessions">
+                        <span class="nav-icon">📋</span>
+                        Session Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="analytics">
+                        <span class="nav-icon">📈</span>
+                        Analytics & Reports
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Overview Page -->
+            <div id="overview" class="page active">
+                <div class="page-header">
+                    <h1>Dashboard Overview</h1>
+                    <p>Welcome to your EMG Configuration Management System</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-configs">0</div>
+                        <div class="stat-label">Total Configurations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-sessions">0</div>
+                        <div class="stat-label">Total Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="active-muscles">0</div>
+                        <div class="stat-label">Active Muscle Groups</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avg-snr">0</div>
+                        <div class="stat-label">Average SNR (dB)</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn--primary" onclick="navigateToPage('configurations')">Add New Configuration</button>
+                        <button class="btn btn--secondary" onclick="navigateToPage('sessions')">Start New Session</button>
+                        <button class="btn btn--outline" onclick="navigateToPage('body-diagram')">View Body Diagram</button>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h3>Recent Activity</h3>
+                    <div id="recent-activity-list" class="activity-list">
+                        <!-- Recent activity items will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Management Page -->
+            <div id="configurations" class="page">
+                <div class="page-header">
+                    <h1>Configuration Management</h1>
+                    <button class="btn btn--primary" onclick="showAddConfigForm()">Add New Configuration</button>
+                </div>
+
+                <div class="search-filters">
+                    <input type="text" class="form-control" id="config-search" placeholder="Search configurations...">
+                    <select class="form-control" id="electrode-filter">
+                        <option value="">All Electrode Types</option>
+                        <option value="bipolar">Bipolar</option>
+                        <option value="monopolar">Monopolar</option>
+                        <option value="multichannel">Multi-channel</option>
+                    </select>
+                </div>
+
+                <div id="configurations-list" class="configurations-list">
+                    <!-- Configuration cards will be populated here -->
+                </div>
+
+                <!-- Add Configuration Modal -->
+                <div id="add-config-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Add New Configuration</h3>
+                            <button class="modal-close" onclick="hideAddConfigForm()">&times;</button>
+                        </div>
+                        <form id="add-config-form" class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">Configuration Name</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Electrode Type</label>
+                                <select class="form-control" name="electrodeType" required>
+                                    <option value="">Select electrode type</option>
+                                    <option value="bipolar">Bipolar</option>
+                                    <option value="monopolar">Monopolar</option>
+                                    <option value="multichannel">Multi-channel</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Target Muscle Group</label>
+                                <select class="form-control" name="muscleGroup" required>
+                                    <option value="">Select muscle group</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Electrode Specifications</label>
+                                <input type="text" class="form-control" name="specs" placeholder="e.g., Ag/AgCl, 10mm diameter, <5kΩ impedance">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Placement Notes</label>
+                                <textarea class="form-control" name="placement" rows="3" placeholder="Describe electrode placement..."></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn--secondary" onclick="hideAddConfigForm()">Cancel</button>
+                                <button type="submit" class="btn btn--primary">Save Configuration</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body Diagram Page -->
+            <div id="body-diagram" class="page">
+                <div class="page-header">
+                    <h1>Interactive Body Diagram</h1>
+                    <p>Click on muscle groups to view or assign configurations</p>
+                </div>
+
+                <div class="body-diagram-container">
+                    <div class="diagram-toggle">
+                        <button class="btn btn--secondary active" id="front-view-btn" onclick="showBodyView('front')">Front View</button>
+                        <button class="btn btn--secondary" id="back-view-btn" onclick="showBodyView('back')">Back View</button>
+                    </div>
+
+                    <div class="body-diagrams">
+                        <div id="front-body" class="body-view active">
+                            <svg class="body-svg" viewBox="0 0 400 600">
+                                <!-- Front body outline -->
+                                <path d="M200 50 C180 50 160 60 150 80 L140 120 L130 160 L125 200 L120 240 L115 280 L110 320 L105 360 L100 400 L95 440 L90 480 L85 520 L80 560 L200 580 L320 560 L315 520 L310 480 L305 440 L300 400 L295 360 L290 320 L285 280 L280 240 L275 200 L270 160 L260 120 L250 80 C240 60 220 50 200 50 Z" 
+                                      fill="#f0f8ff" stroke="#1e3a8a" stroke-width="2"/>
+                                <!-- Muscle group indicators will be added via JavaScript -->
+                            </svg>
+                        </div>
+
+                        <div id="back-body" class="body-view">
+                            <svg class="body-svg" viewBox="0 0 400 600">
+                                <!-- Back body outline -->
+                                <path d="M200 50 C180 50 160 60 150 80 L140 120 L130 160 L125 200 L120 240 L115 280 L110 320 L105 360 L100 400 L95 440 L90 480 L85 520 L80 560 L200 580 L320 560 L315 520 L310 480 L305 440 L300 400 L295 360 L290 320 L285 280 L280 240 L275 200 L270 160 L260 120 L250 80 C240 60 220 50 200 50 Z" 
+                                      fill="#f0f8ff" stroke="#1e3a8a" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Muscle Group Info Panel -->
+                <div id="muscle-info-panel" class="muscle-info-panel">
+                    <h3 id="selected-muscle-name">Select a muscle group</h3>
+                    <div id="muscle-details" class="muscle-details">
+                        <p>Click on a muscle group to view configuration details and options.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Management Page -->
+            <div id="sessions" class="page">
+                <div class="page-header">
+                    <h1>Session Management</h1>
+                    <button class="btn btn--primary" onclick="showAddSessionForm()">Create New Session</button>
+                </div>
+
+                <div id="sessions-list" class="sessions-list">
+                    <!-- Session cards will be populated here -->
+                </div>
+
+                <!-- Add Session Modal -->
+                <div id="add-session-modal" class="modal">
+                    <div class="modal-content large">
+                        <div class="modal-header">
+                            <h3>Create New Session</h3>
+                            <button class="modal-close" onclick="hideAddSessionForm()">&times;</button>
+                        </div>
+                        <form id="add-session-form" class="modal-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Session Name</label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Configuration</label>
+                                    <select class="form-control" name="configuration" required>
+                                        <option value="">Select configuration</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Subject ID</label>
+                                    <input type="text" class="form-control" name="subject" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-control" name="date" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Session Notes</label>
+                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                            </div>
+
+                            <div class="file-upload-section">
+                                <h4>Data Upload</h4>
+                                <div class="upload-area" id="raw-signal-upload">
+                                    <p>Drag & drop raw signal files here or click to browse</p>
+                                    <input type="file" accept=".txt,.dat,.bin" multiple>
+                                </div>
+                                <div class="upload-area" id="csv-data-upload">
+                                    <p>Drag & drop CSV data files here or click to browse</p>
+                                    <input type="file" accept=".csv" multiple>
+                                </div>
+                            </div>
+
+                            <div class="metrics-section">
+                                <h4>Session Metrics</h4>
+                                <div id="metrics-inputs" class="metrics-inputs">
+                                    <!-- Metric input fields will be populated here -->
+                                </div>
+                                <button type="button" class="btn btn--outline" onclick="addCustomMetric()">Add Custom Metric</button>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn--secondary" onclick="hideAddSessionForm()">Cancel</button>
+                                <button type="submit" class="btn btn--primary">Create Session</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="analytics" class="page">
+                <div class="page-header">
+                    <h1>Analytics & Reports</h1>
+                    <button class="btn btn--outline" onclick="exportData()">Export Data</button>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="card analytics-card">
+                        <div class="card__header">
+                            <h3>Signal Quality Trends</h3>
+                        </div>
+                        <div class="card__body">
+                            <canvas id="signal-quality-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card analytics-card">
+                        <div class="card__header">
+                            <h3>Configuration Performance</h3>
+                        </div>
+                        <div class="card__body">
+                            <canvas id="configuration-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card analytics-card">
+                        <div class="card__header">
+                            <h3>Muscle Group Activity</h3>
+                        </div>
+                        <div class="card__body">
+                            <canvas id="muscle-activity-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card analytics-card">
+                        <div class="card__header">
+                            <h3>Recent Performance Summary</h3>
+                        </div>
+                        <div class="card__body">
+                            <div id="performance-summary" class="performance-summary">
+                                <!-- Performance metrics will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
