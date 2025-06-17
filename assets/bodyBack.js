@@ -2,6 +2,7 @@ export const bodyBack = [
   // Neck
   {
     slug: "neck",
+    name: "Neck",
     color: "#3f3f3f",
     path: {
       left: [
