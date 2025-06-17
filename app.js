@@ -1,9 +1,9 @@
 // EMG Dashboard Application
 export default class EMGDashboard {
-  constructor(front, back) {
+  constructor(bodyFront, bodyBack) {
     /* 🟢  SVG data arrives through the constructor */
-    this.bodyFront        = front;
-    this.bodyBack         = back;
+    this.bodyFront = bodyFront || [];
+    this.bodyBack = bodyBack || [];
 
     /* 🔵  persistent app-state */
     this.data = { configurations: [], sessions: [], customMetrics: [] };
@@ -42,8 +42,8 @@ export default class EMGDashboard {
         this.setupFileUploads();
     }
     getViewData(view) {
-        return view === "front" ? bodyFront : bodyBack;
-      }
+    return view === "front" ? this.bodyFront : this.bodyBack;
+}
 
   /*  flatten left / right / common path arrays into one <path> element  */
     buildPathElement(part) {
@@ -168,98 +168,88 @@ export default class EMGDashboard {
 
         this.renderRecentActivity();
     }
-     /*  render SVG for current anterior / posterior view  */
+    // Replace the renderBodyDiagram method:
   renderBodyDiagram() {
-    const container = document.querySelector(".body-view.active");
-    if (!container) return;
-
-    /* clear old */
-    container.innerHTML = "";
-
-    /* create <svg> */
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 600 1200");   //  matches library
-    svg.setAttribute("width",  "100%");
-    svg.setAttribute("height", "100%");
-
-    /* add every muscle path */
-    this.getViewData(this.currentBodyView).forEach(part => {
-      const pathEl = this.buildPathElement(part);
-      pathEl.addEventListener("click", () => this.selectMuscle(part.slug));
-      svg.appendChild(pathEl);
-    });
-
-    container.appendChild(svg);
+      const container = document.querySelector(`#${this.currentBodyView}-body`);
+      if (!container) return;
+      
+      container.innerHTML = "";
+      
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 600 1200");
+      svg.setAttribute("width", "100%");
+      svg.setAttribute("height", "100%");
+      svg.classList.add("body-svg");
+      
+      const currentData = this.getViewData(this.currentBodyView);
+      currentData.forEach(part => {
+          const pathEl = this.buildPathElement(part);
+          svg.appendChild(pathEl);
+      });
+      
+      container.appendChild(svg);
   }
+
 
   /*  handle click  */
   /** ------------------------------------------------------------------
  *  Handle a user click on any SVG muscle-outline <path>.
  *  Keeps UI labels in sync and shows recent configs & sessions.
  * -----------------------------------------------------------------*/
-selectMuscle(slug) {                                            // <─ uses SVG slug
-  /* 1 – remember the current selection so other methods can read it */
-  this.selectedMuscle = slug;                                   // [1]
-
-  /* 2 – lookup display-name inside the bodyFront/bodyBack arrays  */
-  const allParts  = [...bodyFront, ...bodyBack];                // [2]
-  const part      = allParts.find(p => p.slug === slug);        // [2]
-  const muscleName = part ? (part.name || slug) : slug;         // [3]
-  document.getElementById('selected-muscle-name').textContent = muscleName;  // [1]
-
-  /* 3 – gather related configurations & sessions -----------------*/
-  const configs = this.data.configurations
-    .filter(c => c.muscleGroup === slug);                       // [4]
-
-  const sessions = this.data.sessions
-    .filter(s => {
-      const cfg = this.data.configurations.find(c => c.id === s.configuration); // [4]
-      return cfg && cfg.muscleGroup === slug;                   // [4]
+// Replace the selectMuscle method:
+selectMuscle(slug) {
+    this.selectedMuscle = slug;
+    
+    const allParts = [...this.bodyFront, ...this.bodyBack];
+    const part = allParts.find(p => p.slug === slug);
+    const muscleName = part ? (part.name || slug) : slug;
+    
+    const nameElement = document.getElementById('selected-muscle-name');
+    if (nameElement) {
+        nameElement.textContent = muscleName;
+    }
+    
+    const configs = this.data.configurations.filter(c => c.muscleGroup === slug);
+    const sessions = this.data.sessions.filter(s => {
+        const cfg = this.data.configurations.find(c => c.id === s.configuration);
+        return cfg && cfg.muscleGroup === slug;
     });
-
-  /* 4 – build the details panel ----------------------------------*/
-  let html = `<h4>${muscleName}</h4>`;                          // [5]
-
-  /* 4a: configurations block */
-  if (configs.length) {                                         // [4]
-    html += `
-      <div class="muscle-config-info">
-        <h5>Configurations (${configs.length})</h5>
-        ${configs.map(c => `
-          <div style="margin-bottom:8px;">
-            <strong>${c.name}</strong> – ${this.electrodeTypes
-              .find(e => e.value === c.electrodeType)?.label || 'Custom'}
-          </div>`).join('')}
-      </div>`;
-  }
-
-  /* 4b: recent sessions block */
-  if (sessions.length) {                                        // [4]
-    html += `
-      <div class="muscle-config-info">
-        <h5>Recent Sessions (${sessions.length})</h5>
-        ${sessions.slice(-3).map(s => `
-          <div style="margin-bottom:4px;">
-            ${s.name} – ${this.formatDate(s.date)}
-          </div>`).join('')}
-      </div>`;
-  }
-
-  /* 4c: call-to-action button */
-  html += configs.length
-    ? `<button class="btn btn--primary"
-               onclick="emgDashboard.navigateToPage('sessions')">
-         Start New Session
-       </button>`
-    : `<p>No configurations found for this muscle group.</p>
-       <button class="btn btn--primary"
-               onclick="emgDashboard.navigateToPage('configurations')">
-         Create Configuration
-       </button>`;
-
-  /* 5 – inject into the side panel */
-  document.getElementById('muscle-details').innerHTML = html;   // [1]
+    
+    let html = `<h3>${muscleName}</h3>`;
+    
+    if (configs.length) {
+        html += `
+            <h4>Configurations (${configs.length})</h4>
+            ${configs.map(c => `
+                <div class="muscle-config-info">
+                    <strong>${c.name}</strong> – ${this.electrodeTypes.find(e => e.value === c.electrodeType)?.label || 'Custom'}
+                </div>
+            `).join('')}
+        `;
+    }
+    
+    if (sessions.length) {
+        html += `
+            <h4>Recent Sessions (${sessions.length})</h4>
+            ${sessions.slice(-3).map(s => `
+                <div class="muscle-config-info">
+                    <strong>${s.name}</strong> – ${this.formatDate(s.date)}
+                </div>
+            `).join('')}
+        `;
+    }
+    
+    html += configs.length
+        ? `<button class="btn btn--primary" onclick="showAddSessionForm()">Start New Session</button>`
+        : `<p>No configurations found for this muscle group.</p>
+           <button class="btn btn--primary" onclick="showAddConfigForm()">Create Configuration</button>`;
+    
+    const detailsElement = document.getElementById('muscle-details');
+    if (detailsElement) {
+        detailsElement.innerHTML = html;
+    }
 }
+
 
 
   /*  details side-panel  */
@@ -320,17 +310,20 @@ selectMuscle(slug) {                                            // <─ uses SVG
         `).join('');
     }
 
-    // Configuration Management
+    // Replace the populateInitialData method:
     populateInitialData() {
-        // Populate muscle group dropdown
         const muscleSelect = document.querySelector('select[name="muscleGroup"]');
-        const allMuscles = [...this.bodyFront, ...this.bodyBack];
-        muscleSelect.innerHTML = '<option value="">Select muscle group</option>' +
-            allMuscles.map(muscle => `<option value="${muscle.id}">${muscle.name}</option>`).join('');
-
-        // Populate configuration dropdown for sessions
+        if (muscleSelect) {
+            const allMuscles = [...this.bodyFront, ...this.bodyBack];
+            muscleSelect.innerHTML = '<option value="">Select muscle group</option>' +
+                allMuscles.map(muscle => 
+                    `<option value="${muscle.slug}">${muscle.name || muscle.slug}</option>`
+                ).join('');
+        }
+        
         this.updateConfigurationDropdown();
     }
+
 
     updateConfigurationDropdown() {
         const configSelect = document.querySelector('select[name="configuration"]');
@@ -835,6 +828,7 @@ selectMuscle(slug) {                                            // <─ uses SVG
 const emgDashboard = new EMGDashboard();
 
 // Global functions for onclick handlers
+/*
 function navigateToPage(page) {
     emgDashboard.navigateToPage(page);
 }
@@ -866,3 +860,4 @@ function addCustomMetric() {
 function exportData() {
     emgDashboard.exportData();
 }
+*/
