@@ -80,9 +80,9 @@
                 <div class="quick-actions">
                     <h3>Quick Actions</h3>
                     <div class="action-buttons">
-                        <button class="btn btn--primary" onclick="showAddConfigForm()">Add Configuration</button>
-                        <button class="btn btn--primary" onclick="showAddSessionForm()">Start Session</button>
-                        <button class="btn btn--secondary" onclick="exportData()">Export Data</button>
+                        <button class="btn btn--primary" id="add-config-btn">Add Configuration</button>
+                        <button class="btn btn--primary" id="add-session-btn">Start Session</button>
+                        <button class="btn btn--secondary" id="export-data-btn">Export Data</button>
                     </div>
                 </div>
 
@@ -114,7 +114,7 @@
                         <option value="monopolar">Monopolar</option>
                         <option value="multichannel">Multi-channel</option>
                     </select>
-                    <button class="btn btn--primary" onclick="showAddConfigForm()">Add Configuration</button>
+                    <button class="btn btn--primary" id="add-config-btn-2">Add Configuration</button>
                 </div>
 
                 <!-- Configurations List -->
@@ -131,7 +131,7 @@
                 </div>
 
                 <div class="search-filters">
-                    <button class="btn btn--primary" onclick="showAddSessionForm()">Start New Session</button>
+                    <button class="btn btn--primary" id="add-session-btn-2">Start New Session</button>
                 </div>
 
                 <!-- Sessions List -->
@@ -151,8 +151,8 @@
                 <div class="body-diagram-container">
                     <!-- View Toggle -->
                     <div class="diagram-toggle">
-                        <button id="front-view-btn" class="btn btn--secondary active" onclick="showBodyView('front')">Front View</button>
-                        <button id="back-view-btn" class="btn btn--secondary" onclick="showBodyView('back')">Back View</button>
+                        <button id="front-view-btn" class="btn btn--secondary active">Front View</button>
+                        <button id="back-view-btn" class="btn btn--secondary">Back View</button>
                     </div>
 
                     <!-- Body Diagrams -->
@@ -221,7 +221,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Add New Configuration</h3>
-                <button class="modal-close" onclick="hideAddConfigForm()">&times;</button>
+                <button class="modal-close" id="close-config-modal">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="add-config-form">
@@ -258,7 +258,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn--secondary" onclick="hideAddConfigForm()">Cancel</button>
+                <button type="button" class="btn btn--secondary" id="cancel-config-btn">Cancel</button>
                 <button type="submit" form="add-config-form" class="btn btn--primary">Save Configuration</button>
             </div>
         </div>
@@ -269,7 +269,7 @@
         <div class="modal-content large">
             <div class="modal-header">
                 <h3>Start New Session</h3>
-                <button class="modal-close" onclick="hideAddSessionForm()">&times;</button>
+                <button class="modal-close" id="close-session-modal">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="add-session-form">
@@ -307,7 +307,7 @@
                         <div id="metrics-inputs" class="metrics-inputs">
                             <!-- Metrics inputs will be populated by JavaScript -->
                         </div>
-                        <button type="button" class="btn btn--secondary btn--sm" onclick="addCustomMetric()">Add Custom Metric</button>
+                        <button type="button" class="btn btn--secondary btn--sm" id="add-custom-metric-btn">Add Custom Metric</button>
                     </div>
 
                     <!-- File Upload Section -->
@@ -321,7 +321,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn--secondary" onclick="hideAddSessionForm()">Cancel</button>
+                <button type="button" class="btn btn--secondary" id="cancel-session-btn">Cancel</button>
                 <button type="submit" form="add-session-form" class="btn btn--primary">Start Session</button>
             </div>
         </div>
@@ -330,29 +330,770 @@
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Scripts -->
-    <script type="module" src="bodyFront.js"></script>
-    <script type="module" src="bodyBack.js"></script>
-    <script type="module" src="app.js"></script>
-    <script type="module">
-        import { bodyFront } from './bodyFront.js';
-        import { bodyBack } from './bodyBack.js';
-        import EMGDashboard from './app.js';
-        
-        // Initialize the dashboard with body data
-        window.emgDashboard = new EMGDashboard(bodyFront, bodyBack);
-        
-        // Make functions globally available for onclick handlers
-        window.navigateToPage = (page) => window.emgDashboard.navigateToPage(page);
-        window.showAddConfigForm = () => window.emgDashboard.showAddConfigForm();
-        window.hideAddConfigForm = () => window.emgDashboard.hideAddConfigForm();
-        window.showAddSessionForm = () => window.emgDashboard.showAddSessionForm();
-        window.hideAddSessionForm = () => window.emgDashboard.hideAddSessionForm();
-        window.showBodyView = (view) => window.emgDashboard.showBodyView(view);
-        window.addCustomMetric = () => window.emgDashboard.addCustomMetric();
-        window.exportData = () => window.emgDashboard.exportData();
-        window.deleteConfiguration = (id) => window.emgDashboard.deleteConfiguration(id);
-        window.deleteSession = (id) => window.emgDashboard.deleteSession(id);
+    <!-- CRITICAL: All JavaScript in single file -->
+    <script>
+        // Body data embedded directly to avoid 404 errors
+        const bodyFront = [
+            {
+                slug: "chest",
+                name: "Chest",
+                color: "#3f3f3f",
+                path: {
+                    left: ["M272.91 422.84c-18.95-17.19-22-57-12.64-78.79 5.57-12.99 26.54-24.37 39.97-25.87q20.36-2.26 37.02.75c9.74 1.76 16.13 15.64 18.41 25.04 3.99 16.48 3.23 31.38 1.67 48.06q-1.35 14.35-2.05 16.89c-6.52 23.5-38.08 29.23-58.28 24.53-9.12-2.12-17.24-4.38-24.1-10.61z"],
+                    right: ["M416.04 435c-15.12.11-34.46-6.78-41.37-21.48q-1.88-3.99-2.84-12.18c-2.89-24.41-5.9-53.65 8.44-74.79 4.26-6.26 10.49-7.93 18.36-8.56q11.66-.92 23.32-.35c10.58.53 18.02 2.74 26.62 7.87 12.81 7.65 19.73 14.52 22.67 29.75 4.94 25.57.24 64.14-28.21 74.97q-12.26 4.67-26.99 4.77z"]
+                }
+            },
+            {
+                slug: "biceps",
+                name: "Biceps",
+                color: "#3f3f3f",
+                path: {
+                    left: ["M189.52 492.51c-2.43.62-7.38.57-7.51-3.08-.56-16.01-.42-35.49 5.11-50.26 3.19-8.54 13.89-30.22 23.27-32.72 10.08-2.68 12.68 16.59 12.6 22.8-.22 15.98-7.51 34.79-15.05 48.71-4.29 7.94-9.95 12.38-18.42 14.55z"],
+                    right: ["M526.69 486.31c-9.9-8.61-17.75-33.21-20.65-47.73-1.41-7.06-1.34-29.61 8.58-32.16 10.33-2.66 23.81 25.34 26.6 32.91q2.6 7.04 3.6 16.13 1.62 14.66 1.66 32.28c.03 11.04-16.45 1.48-19.79-1.43z"]
+                }
+            },
+            {
+                slug: "quadriceps",
+                name: "Quadriceps",
+                color: "#3f3f3f",
+                path: {
+                    left: ["M292.42 935.6q-.95-.52-1.57-1.4-4.1-5.79-7-13.53-7.8-20.79-13.3-42.33c-9.06-35.53-19.33-71.36-25.03-107.59-5.33-33.86 4-74.19 20.7-103.37q.35-.62.53.07c14.44 55.57 39.03 107.94 41.45 165.34 1.11 26.34.66 52.96-3.6 79.03-.63 3.83-4.73 27.81-12.18 23.78z"]
+                }
+            }
+        ];
+
+        const bodyBack = [
+            {
+                slug: "trapezius",
+                name: "Trapezius",
+                color: "#3f3f3f",
+                path: {
+                    left: ["M1071.06 308.94c5.6 4.92 6.96 17.83 7.43 24.88q1.5 22.3.93 44.68-1.2 46.76-5.66 94a.57.56 3.7 01-.59.51q-.68-.03-.94-1.01-4.29-15.9-9.79-25.19c-10.24-17.31-18.8-31.84-25.59-49.4-10.19-26.38-15.6-54.28-26.46-80.58q-3.07-7.43-7.61-14.07-.3-.43.2-.6 12.47-4.28 25.48-4.85c5.54-.25 12.15.86 18.32 1.41 9.7.87 16.77 3.6 24.28 10.22z"]
+                }
+            },
+            {
+                slug: "gluteal",
+                name: "Gluteal",
+                color: "#3f3f3f",
+                path: {
+                    left: ["M1007.94 762.81c-16.94-16.64-29.37-37.66-31.47-61-2.06-22.84 15.63-34.95 32.18-45.71 8.2-5.33 46.51-27.32 54.37-17.65 5.92 7.29 13.38 15.84 15.44 25.21q3.01 13.63 2.44 27.6-.94 22.59-6.27 44.49c-2.43 9.96-2.9 17.16-2.59 26.75.47 14.83-18.52 17.18-29.12 14.07-6.38-1.87-13.79-4.83-21.35-6.25q-7.39-1.38-13.63-7.51z"]
+                }
+            },
+            {
+                slug: "hamstring",
+                name: "Hamstring",
+                color: "#3f3f3f",
+                path: {
+                    left: ["M963.27 741.53a.71.7 31.7 011.19-.28q1.51 1.62 2.47 3.99c4.6 11.41 8.93 22.66 11.07 34.72 3.38 19.14 4.84 38.23 3.12 57.74q-1.68 19.06-2.99 38.15c-.51 7.55-.88 15.71.07 23.18q1.08 8.54 1.39 17.57a.52.52 0 01-.98.25q-1.03-2.07-1.8-4.62-5.13-16.92-7.25-34.49-5.01-41.45-6.86-83.17-1.09-24.75-.07-49.51.06-1.59.64-3.53z"]
+                }
+            }
+        ];
+
+        // EMG Dashboard Class
+        class EMGDashboard {
+            constructor() {
+                this.bodyFront = bodyFront;
+                this.bodyBack = bodyBack;
+                this.data = { configurations: [], sessions: [], customMetrics: [] };
+                this.currentBodyView = 'front';
+                this.selectedMuscle = null;
+                
+                this.electrodeTypes = [
+                    { value: 'bipolar', label: 'Bipolar', description: 'Two electrodes of same size for differential measurement' },
+                    { value: 'monopolar', label: 'Monopolar', description: 'Active electrode with reference electrode' },
+                    { value: 'multichannel', label: 'Multi-channel', description: 'Multiple electrode array for high-density recording' }
+                ];
+                
+                this.defaultMetrics = [
+                    { name: 'RMS', unit: 'mV', description: 'Root Mean Square amplitude' },
+                    { name: 'ARV', unit: 'mV', description: 'Average Rectified Value' },
+                    { name: 'MNF', unit: 'Hz', description: 'Mean Frequency' },
+                    { name: 'MDF', unit: 'Hz', description: 'Median Frequency' },
+                    { name: 'SNR', unit: 'dB', description: 'Signal-to-Noise Ratio' }
+                ];
+                
+                this.init();
+            }
+
+            init() {
+                this.loadData();
+                this.initializeEventListeners();
+                this.populateInitialData();
+                this.renderBodyDiagram();
+                this.updateDashboardStats();
+                this.renderConfigurations();
+                this.renderSessions();
+            }
+
+            getViewData(view) {
+                return view === "front" ? this.bodyFront : this.bodyBack;
+            }
+
+            buildPathElement(part) {
+                const d = [
+                    ...(part.path.common || []),
+                    ...(part.path.left || []),
+                    ...(part.path.right || [])
+                ].join(' ');
+                
+                const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                p.setAttribute('d', d);
+                p.setAttribute('fill', part.color || '#6b7280');
+                p.dataset.slug = part.slug;
+                p.classList.add('muscle-path');
+                p.style.cursor = 'pointer';
+                p.addEventListener('click', () => this.selectMuscle(part.slug));
+                return p;
+            }
+
+            loadData() {
+                const savedData = localStorage.getItem('emgDashboardData');
+                if (savedData) {
+                    this.data = JSON.parse(savedData);
+                } else {
+                    this.data.configurations = [
+                        {
+                            "id": "config1",
+                            "name": "Biceps Standard Setup",
+                            "electrodeType": "bipolar",
+                            "muscleGroup": "biceps",
+                            "specs": "Ag/AgCl, 10mm diameter, <5kΩ impedance",
+                            "placement": "Muscle belly, parallel to fiber direction",
+                            "dateCreated": "2025-06-15"
+                        }
+                    ];
+                    this.data.sessions = [
+                        {
+                            "id": "session1",
+                            "name": "Biceps Contraction Study",
+                            "configuration": "config1",
+                            "date": "2025-06-16",
+                            "subject": "Subject001",
+                            "metrics": {"RMS": 0.45, "ARV": 0.38, "MNF": 85.2, "SNR": 15.8},
+                            "notes": "Initial baseline measurement"
+                        }
+                    ];
+                }
+            }
+
+            saveData() {
+                localStorage.setItem('emgDashboardData', JSON.stringify(this.data));
+            }
+
+            initializeEventListeners() {
+                // Navigation
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = link.dataset.page;
+                        this.navigateToPage(page);
+                    });
+                });
+
+                // Button event listeners
+                document.getElementById('add-config-btn').addEventListener('click', () => this.showAddConfigForm());
+                document.getElementById('add-config-btn-2').addEventListener('click', () => this.showAddConfigForm());
+                document.getElementById('add-session-btn').addEventListener('click', () => this.showAddSessionForm());
+                document.getElementById('add-session-btn-2').addEventListener('click', () => this.showAddSessionForm());
+                document.getElementById('export-data-btn').addEventListener('click', () => this.exportData());
+                
+                // Modal close buttons
+                document.getElementById('close-config-modal').addEventListener('click', () => this.hideAddConfigForm());
+                document.getElementById('close-session-modal').addEventListener('click', () => this.hideAddSessionForm());
+                document.getElementById('cancel-config-btn').addEventListener('click', () => this.hideAddConfigForm());
+                document.getElementById('cancel-session-btn').addEventListener('click', () => this.hideAddSessionForm());
+                
+                // Body view toggle
+                document.getElementById('front-view-btn').addEventListener('click', () => this.showBodyView('front'));
+                document.getElementById('back-view-btn').addEventListener('click', () => this.showBodyView('back'));
+                
+                // Custom metric button
+                document.getElementById('add-custom-metric-btn').addEventListener('click', () => this.addCustomMetric());
+
+                // Forms
+                document.getElementById('add-config-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addConfiguration(e.target);
+                });
+
+                document.getElementById('add-session-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addSession(e.target);
+                });
+
+                // Search and filters
+                const configSearch = document.getElementById('config-search');
+                if (configSearch) {
+                    configSearch.addEventListener('input', () => this.filterConfigurations());
+                }
+                
+                const electrodeFilter = document.getElementById('electrode-filter');
+                if (electrodeFilter) {
+                    electrodeFilter.addEventListener('change', () => this.filterConfigurations());
+                }
+            }
+
+            navigateToPage(page) {
+                // Update navigation
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+                // Show page
+                document.querySelectorAll('.page').forEach(p => {
+                    p.classList.remove('active');
+                });
+                document.getElementById(page).classList.add('active');
+
+                // Update page-specific content
+                if (page === 'analytics') {
+                    this.renderAnalytics();
+                }
+                if (page === 'body-diagram') {
+                    this.renderBodyDiagram();
+                }
+            }
+
+            updateDashboardStats() {
+                document.getElementById('total-configs').textContent = this.data.configurations.length;
+                document.getElementById('total-sessions').textContent = this.data.sessions.length;
+                
+                const activeMuscles = new Set(this.data.configurations.map(c => c.muscleGroup)).size;
+                document.getElementById('active-muscles').textContent = activeMuscles;
+                
+                const avgSNR = this.data.sessions.length > 0 ?
+                    (this.data.sessions.reduce((sum, s) => sum + (s.metrics.SNR || 0), 0) / this.data.sessions.length).toFixed(1) : 0;
+                document.getElementById('avg-snr').textContent = avgSNR;
+                
+                this.renderRecentActivity();
+            }
+
+            renderBodyDiagram() {
+                const container = document.querySelector(`#${this.currentBodyView}-body`);
+                if (!container) return;
+                
+                container.innerHTML = "";
+                
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("viewBox", "0 0 600 1200");
+                svg.setAttribute("width", "100%");
+                svg.setAttribute("height", "100%");
+                svg.classList.add("body-svg");
+                
+                const currentData = this.getViewData(this.currentBodyView);
+                currentData.forEach(part => {
+                    const pathEl = this.buildPathElement(part);
+                    svg.appendChild(pathEl);
+                });
+                
+                container.appendChild(svg);
+            }
+
+            selectMuscle(slug) {
+                this.selectedMuscle = slug;
+                
+                const allParts = [...this.bodyFront, ...this.bodyBack];
+                const part = allParts.find(p => p.slug === slug);
+                const muscleName = part ? (part.name || slug) : slug;
+                
+                const nameElement = document.getElementById('selected-muscle-name');
+                if (nameElement) {
+                    nameElement.textContent = muscleName;
+                }
+                
+                const configs = this.data.configurations.filter(c => c.muscleGroup === slug);
+                const sessions = this.data.sessions.filter(s => {
+                    const cfg = this.data.configurations.find(c => c.id === s.configuration);
+                    return cfg && cfg.muscleGroup === slug;
+                });
+                
+                let html = `<h3>${muscleName}</h3>`;
+                
+                if (configs.length) {
+                    html += `
+                        <h4>Configurations (${configs.length})</h4>
+                        ${configs.map(c => `
+                            <div class="muscle-config-info">
+                                <strong>${c.name}</strong> – ${this.electrodeTypes.find(e => e.value === c.electrodeType)?.label || 'Custom'}
+                            </div>
+                        `).join('')}
+                    `;
+                }
+                
+                if (sessions.length) {
+                    html += `
+                        <h4>Recent Sessions (${sessions.length})</h4>
+                        ${sessions.slice(-3).map(s => `
+                            <div class="muscle-config-info">
+                                <strong>${s.name}</strong> – ${this.formatDate(s.date)}
+                            </div>
+                        `).join('')}
+                    `;
+                }
+                
+                html += configs.length
+                    ? `<button class="btn btn--primary" onclick="window.emgDashboard.showAddSessionForm()">Start New Session</button>`
+                    : `<p>No configurations found for this muscle group.</p>
+                       <button class="btn btn--primary" onclick="window.emgDashboard.showAddConfigForm()">Create Configuration</button>`;
+                
+                const detailsElement = document.getElementById('muscle-details');
+                if (detailsElement) {
+                    detailsElement.innerHTML = html;
+                }
+            }
+
+            renderRecentActivity() {
+                const container = document.getElementById('recent-activity-list');
+                const activities = [];
+
+                // Add recent configurations
+                this.data.configurations.slice(-3).forEach(config => {
+                    activities.push({
+                        text: `Configuration "${config.name}" created`,
+                        time: this.formatDate(config.dateCreated),
+                        type: 'config'
+                    });
+                });
+
+                // Add recent sessions
+                this.data.sessions.slice(-3).forEach(session => {
+                    activities.push({
+                        text: `Session "${session.name}" completed`,
+                        time: this.formatDate(session.date),
+                        type: 'session'
+                    });
+                });
+
+                activities.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+                if (activities.length === 0) {
+                    container.innerHTML = '<div class="activity-item"><span class="activity-text">No recent activity</span><span class="activity-time">--</span></div>';
+                    return;
+                }
+
+                container.innerHTML = activities.slice(0, 5).map(activity => `
+                    <div class="activity-item">
+                        <span class="activity-text">${activity.text}</span>
+                        <span class="activity-time">${this.formatDate(activity.time)}</span>
+                    </div>
+                `).join('');
+            }
+
+            populateInitialData() {
+                // Populate muscle group dropdown
+                const muscleSelect = document.querySelector('select[name="muscleGroup"]');
+                if (muscleSelect) {
+                    const allMuscles = [...this.bodyFront, ...this.bodyBack];
+                    muscleSelect.innerHTML = '<option value="">Select muscle group</option>' +
+                        allMuscles.map(muscle => 
+                            `<option value="${muscle.slug}">${muscle.name || muscle.slug}</option>`
+                        ).join('');
+                }
+                
+                this.updateConfigurationDropdown();
+            }
+
+            updateConfigurationDropdown() {
+                const configSelect = document.querySelector('select[name="configuration"]');
+                if (configSelect) {
+                    configSelect.innerHTML = '<option value="">Select configuration</option>' +
+                        this.data.configurations.map(config =>
+                            `<option value="${config.id}">${config.name}</option>`
+                        ).join('');
+                }
+            }
+
+            addConfiguration(form) {
+                const formData = new FormData(form);
+                const config = {
+                    id: 'config_' + Date.now(),
+                    name: formData.get('name'),
+                    electrodeType: formData.get('electrodeType'),
+                    muscleGroup: formData.get('muscleGroup'),
+                    specs: formData.get('specs'),
+                    placement: formData.get('placement'),
+                    dateCreated: new Date().toISOString().split('T')[0]
+                };
+
+                this.data.configurations.push(config);
+                this.saveData();
+                this.renderConfigurations();
+                this.updateConfigurationDropdown();
+                this.updateDashboardStats();
+                this.renderBodyDiagram();
+                this.hideAddConfigForm();
+                this.showToast('Configuration added successfully!', 'success');
+                form.reset();
+            }
+
+            renderConfigurations() {
+                const container = document.getElementById('configurations-list');
+                if (!container) return;
+                
+                if (this.data.configurations.length === 0) {
+                    container.innerHTML = '<p>No configurations found. Create your first configuration to get started.</p>';
+                    return;
+                }
+
+                container.innerHTML = this.data.configurations.map(config => `
+                    <div class="config-card">
+                        <div class="config-card-header">
+                            <div class="config-card-title">${config.name}</div>
+                            <div class="config-card-meta">Created: ${this.formatDate(config.dateCreated)}</div>
+                        </div>
+                        <div class="config-card-body">
+                            <div class="config-detail">
+                                <span class="config-detail-label">Electrode Type:</span>
+                                <span class="config-detail-value">${this.electrodeTypes.find(e => e.value === config.electrodeType)?.label || config.electrodeType}</span>
+                            </div>
+                            <div class="config-detail">
+                                <span class="config-detail-label">Muscle Group:</span>
+                                <span class="config-detail-value">${this.getMuscleNameById(config.muscleGroup)}</span>
+                            </div>
+                            <div class="config-detail">
+                                <span class="config-detail-label">Specifications:</span>
+                                <span class="config-detail-value">${config.specs || 'Not specified'}</span>
+                            </div>
+                            <div class="config-detail">
+                                <span class="config-detail-label">Placement:</span>
+                                <span class="config-detail-value">${config.placement || 'Not specified'}</span>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn--secondary btn--sm">Edit</button>
+                            <button class="btn btn--secondary btn--sm" onclick="window.emgDashboard.deleteConfiguration('${config.id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            filterConfigurations() {
+                const searchTerm = document.getElementById('config-search')?.value.toLowerCase() || '';
+                const electrodeFilter = document.getElementById('electrode-filter')?.value || '';
+                
+                const filteredConfigs = this.data.configurations.filter(config => {
+                    const matchesSearch = config.name.toLowerCase().includes(searchTerm) ||
+                        this.getMuscleNameById(config.muscleGroup).toLowerCase().includes(searchTerm);
+                    const matchesElectrode = !electrodeFilter || config.electrodeType === electrodeFilter;
+                    return matchesSearch && matchesElectrode;
+                });
+                
+                this.renderFilteredConfigurations(filteredConfigs);
+            }
+
+            renderFilteredConfigurations(configs) {
+                const container = document.getElementById('configurations-list');
+                if (!container) return;
+                
+                if (configs.length === 0) {
+                    container.innerHTML = '<p>No configurations match your search criteria.</p>';
+                    return;
+                }
+
+                container.innerHTML = configs.map(config => `
+                    <div class="config-card">
+                        <div class="config-card-header">
+                            <div class="config-card-title">${config.name}</div>
+                            <div class="config-card-meta">Created: ${this.formatDate(config.dateCreated)}</div>
+                        </div>
+                        <div class="config-card-body">
+                            <div class="config-detail">
+                                <span class="config-detail-label">Electrode Type:</span>
+                                <span class="config-detail-value">${this.electrodeTypes.find(e => e.value === config.electrodeType)?.label || config.electrodeType}</span>
+                            </div>
+                            <div class="config-detail">
+                                <span class="config-detail-label">Muscle Group:</span>
+                                <span class="config-detail-value">${this.getMuscleNameById(config.muscleGroup)}</span>
+                            </div>
+                            <div class="config-detail">
+                                <span class="config-detail-label">Specifications:</span>
+                                <span class="config-detail-value">${config.specs || 'Not specified'}</span>
+                            </div>
+                            <div class="config-detail">
+                                <span class="config-detail-label">Placement:</span>
+                                <span class="config-detail-value">${config.placement || 'Not specified'}</span>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn btn--secondary btn--sm">Edit</button>
+                            <button class="btn btn--secondary btn--sm" onclick="window.emgDashboard.deleteConfiguration('${config.id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            deleteConfiguration(configId) {
+                if (confirm('Are you sure you want to delete this configuration?')) {
+                    this.data.configurations = this.data.configurations.filter(c => c.id !== configId);
+                    this.saveData();
+                    this.renderConfigurations();
+                    this.updateConfigurationDropdown();
+                    this.updateDashboardStats();
+                    this.renderBodyDiagram();
+                    this.showToast('Configuration deleted successfully!', 'success');
+                }
+            }
+
+            addSession(form) {
+                const formData = new FormData(form);
+                const session = {
+                    id: 'session_' + Date.now(),
+                    name: formData.get('name'),
+                    configuration: formData.get('configuration'),
+                    date: formData.get('date'),
+                    subject: formData.get('subject'),
+                    notes: formData.get('notes'),
+                    metrics: {},
+                    files: []
+                };
+
+                // Collect metrics
+                document.querySelectorAll('.metric-input-group input').forEach(input => {
+                    if (input.value) {
+                        session.metrics[input.name] = parseFloat(input.value);
+                    }
+                });
+
+                this.data.sessions.push(session);
+                this.saveData();
+                this.renderSessions();
+                this.updateDashboardStats();
+                this.hideAddSessionForm();
+                this.showToast('Session created successfully!', 'success');
+                form.reset();
+                this.resetMetricsInputs();
+            }
+
+            renderSessions() {
+                const container = document.getElementById('sessions-list');
+                if (!container) return;
+                
+                if (this.data.sessions.length === 0) {
+                    container.innerHTML = '<p>No sessions found. Create your first session to get started.</p>';
+                    return;
+                }
+
+                container.innerHTML = this.data.sessions.map(session => {
+                    const config = this.data.configurations.find(c => c.id === session.configuration);
+                    const configName = config ? config.name : 'Unknown Configuration';
+                    
+                    return `
+                        <div class="session-card">
+                            <div class="session-card-header">
+                                <div class="session-card-title">${session.name}</div>
+                                <div class="session-card-meta">${configName} • ${this.formatDate(session.date)} • ${session.subject}</div>
+                            </div>
+                            <div class="session-metrics">
+                                ${Object.entries(session.metrics).map(([key, value]) => `
+                                    <div class="metric-item">
+                                        <div class="metric-value">${value}</div>
+                                        <div class="metric-label">${key}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="config-actions">
+                                <button class="btn btn--secondary btn--sm">View Details</button>
+                                <button class="btn btn--secondary btn--sm" onclick="window.emgDashboard.deleteSession('${session.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            deleteSession(sessionId) {
+                if (confirm('Are you sure you want to delete this session?')) {
+                    this.data.sessions = this.data.sessions.filter(s => s.id !== sessionId);
+                    this.saveData();
+                    this.renderSessions();
+                    this.updateDashboardStats();
+                    this.showToast('Session deleted successfully!', 'success');
+                }
+            }
+
+            setupMetricsInputs() {
+                const container = document.getElementById('metrics-inputs');
+                if (!container) return;
+                
+                const allMetrics = [...this.defaultMetrics, ...this.data.customMetrics];
+                container.innerHTML = allMetrics.map(metric => `
+                    <div class="metric-input-group">
+                        <label>${metric.name}</label>
+                        <input type="number" name="${metric.name}" step="0.01">
+                        <span class="metric-unit">${metric.unit}</span>
+                        ${this.data.customMetrics.includes(metric) ?
+                            `<button type="button" class="remove-metric" onclick="window.emgDashboard.removeCustomMetric('${metric.name}')">&times;</button>` :
+                            ''
+                        }
+                    </div>
+                `).join('');
+            }
+
+            addCustomMetric() {
+                const name = prompt('Enter metric name:');
+                if (!name) return;
+                
+                const unit = prompt('Enter unit (e.g., mV, Hz, dB):');
+                if (!unit) return;
+                
+                const customMetric = { name, unit, description: 'Custom metric' };
+                this.data.customMetrics.push(customMetric);
+                this.saveData();
+                this.setupMetricsInputs();
+                this.showToast(`Custom metric "${name}" added!`, 'success');
+            }
+
+            removeCustomMetric(metricName) {
+                this.data.customMetrics = this.data.customMetrics.filter(m => m.name !== metricName);
+                this.saveData();
+                this.setupMetricsInputs();
+                this.showToast(`Custom metric "${metricName}" removed!`, 'success');
+            }
+
+            resetMetricsInputs() {
+                document.querySelectorAll('.metric-input-group input').forEach(input => {
+                    input.value = '';
+                });
+            }
+
+            renderAnalytics() {
+                this.renderSignalQualityChart();
+                this.renderPerformanceSummary();
+            }
+
+            renderSignalQualityChart() {
+                const canvas = document.getElementById('signal-quality-chart');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 2;
+                
+                const data = this.data.sessions.map(s => s.metrics.SNR || 0);
+                const maxVal = Math.max(...data, 20);
+                
+                ctx.beginPath();
+                data.forEach((value, index) => {
+                    const x = (index / (data.length - 1)) * canvas.width;
+                    const y = canvas.height - (value / maxVal) * canvas.height;
+                    if (index === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+                
+                ctx.fillStyle = '#1e3a8a';
+                ctx.font = '14px Arial';
+                ctx.fillText('SNR Over Time', 10, 20);
+            }
+
+            renderPerformanceSummary() {
+                const container = document.getElementById('performance-summary');
+                if (!container) return;
+                
+                const totalSessions = this.data.sessions.length;
+                const avgRMS = totalSessions > 0 ?
+                    (this.data.sessions.reduce((sum, s) => sum + (s.metrics.RMS || 0), 0) / totalSessions).toFixed(2) : 0;
+                const avgMNF = totalSessions > 0 ?
+                    (this.data.sessions.reduce((sum, s) => sum + (s.metrics.MNF || 0), 0) / totalSessions).toFixed(1) : 0;
+                const bestSNR = totalSessions > 0 ?
+                    Math.max(...this.data.sessions.map(s => s.metrics.SNR || 0)).toFixed(1) : 0;
+
+                container.innerHTML = `
+                    <div class="summary-metric">
+                        <div class="summary-value">${avgRMS}</div>
+                        <div class="summary-label">Avg RMS (mV)</div>
+                    </div>
+                    <div class="summary-metric">
+                        <div class="summary-value">${avgMNF}</div>
+                        <div class="summary-label">Avg MNF (Hz)</div>
+                    </div>
+                    <div class="summary-metric">
+                        <div class="summary-value">${bestSNR}</div>
+                        <div class="summary-label">Best SNR (dB)</div>
+                    </div>
+                    <div class="summary-metric">
+                        <div class="summary-value">${totalSessions}</div>
+                        <div class="summary-label">Total Sessions</div>
+                    </div>
+                `;
+            }
+
+            showAddConfigForm() {
+                document.getElementById('add-config-modal').classList.add('active');
+            }
+
+            hideAddConfigForm() {
+                document.getElementById('add-config-modal').classList.remove('active');
+            }
+
+            showAddSessionForm() {
+                this.setupMetricsInputs();
+                this.updateConfigurationDropdown();
+                document.getElementById('add-session-form').querySelector('input[name="date"]').value =
+                    new Date().toISOString().split('T')[0];
+                document.getElementById('add-session-modal').classList.add('active');
+            }
+
+            hideAddSessionForm() {
+                document.getElementById('add-session-modal').classList.remove('active');
+            }
+
+            showBodyView(view) {
+                this.currentBodyView = view;
+                document.querySelectorAll('.body-view').forEach(v => v.classList.remove('active'));
+                document.getElementById(`${view}-body`).classList.add('active');
+                document.querySelectorAll('.diagram-toggle .btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(`${view}-view-btn`).classList.add('active');
+                this.renderBodyDiagram();
+            }
+
+            formatDate(dateString) {
+                return new Date(dateString).toLocaleDateString();
+            }
+
+            getMuscleNameById(id) {
+                const allMuscles = [...this.bodyFront, ...this.bodyBack];
+                const muscle = allMuscles.find(m => m.slug === id);
+                return muscle ? muscle.name : id;
+            }
+
+            showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `<div class="toast-message">${message}</div>`;
+                document.getElementById('toast-container').appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 100);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            exportData() {
+                const dataToExport = {
+                    configurations: this.data.configurations,
+                    sessions: this.data.sessions,
+                    customMetrics: this.data.customMetrics,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `emg_dashboard_export_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                this.showToast('Data exported successfully!', 'success');
+            }
+        }
+
+        // Initialize the dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            window.emgDashboard = new EMGDashboard();
+        });
     </script>
 </body>
 </html>
